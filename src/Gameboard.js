@@ -6,27 +6,27 @@ class Gameboard {
     this.missedShots = [];
   }
 
-  placeShip(ship, x, y) {
+  placeShip(ship, row, column) {
     // Assuming ships are placed horizontally for simplicity.
-    if (x + ship.length > this.size) {
+    if (column + ship.length > this.size) {
       throw new Error("Ship cannot be placed out of bounds");
     }
-
+  
     for (let i = 0; i < ship.length; i++) {
-      if (this.board[y][x + i] !== null) {
+      if (this.board[row][column + i] !== null) {
         throw new Error("Cannot place ship, position already occupied");
       }
     }
-
+  
     for (let i = 0; i < ship.length; i++) {
-      this.board[y][x + i] = ship;
+      this.board[row][column + i] = ship;
     }
-
+  
     this.ships.push(ship);
   }
 
-  getShipAt(x, y) {
-    return this.board[y][x];
+  getShipAt(row, column) {
+    return this.board[row][column];
   }
 }
 
