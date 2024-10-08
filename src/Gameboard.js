@@ -28,6 +28,21 @@ class Gameboard {
   getShipAt(row, column) {
     return this.board[row][column];
   }
+
+  receiveAttack(row, column) {
+    if (this.missedShots.some(([r, c]) => r === row && c === column)) {
+      throw new Error("Position has already been attacked");
+    }
+  
+    const target = this.getShipAt(row, column);
+  
+    if (target) {
+      target.hit();
+    } else {
+      this.missedShots.push([row, column]);
+    }
+  }
+  
 }
 
 export default Gameboard;
