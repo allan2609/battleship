@@ -37,9 +37,11 @@ class Gameboard {
     const target = this.getShipAt(row, column);
   
     if (target) {
-      target.hit();
+      target.hit(); 
+      return "hit";
     } else {
       this.missedShots.push([row, column]);
+      return "miss";
     }
   }
   
