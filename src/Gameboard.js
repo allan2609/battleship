@@ -3,7 +3,7 @@ class Gameboard {
     this.size = size;
     this.board = Array(size).fill(null).map(() => Array(size).fill(null));
     this.ships = [];
-    this.missedShots = [];
+    this.attackedPositions = [];
   }
 
   placeShip(ship, row, column) {
@@ -30,17 +30,18 @@ class Gameboard {
   }
 
   receiveAttack(row, column) {
-    if (this.missedShots.some(([r, c]) => r === row && c === column)) {
+    if (this.attackedPositions.some(pos => pos.row === row && pos.column === column)) {
       throw new Error("Position has already been attacked");
     }
-  
+
     const target = this.getShipAt(row, column);
-  
+
     if (target) {
-      target.hit(); 
+      target.hit();
+      this.attackedPositions.push({ row, column, hit: true });
       return "hit";
     } else {
-      this.missedShots.push([row, column]);
+      this.attackedPositions.push({ row, column, hit: false });
       return "miss";
     }
   }
