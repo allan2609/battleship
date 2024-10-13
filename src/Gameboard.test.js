@@ -20,7 +20,7 @@ test("receiveAttack sends the hit function to the correct ship", () => {
 test("receiveAttack records the coordinates of a missed shot", () => {
   const gameboard = new Gameboard(10);
   gameboard.receiveAttack(5, 5);
-  expect(gameboard.attackedPositions).toContainEqual([5, 5]);
+  expect(gameboard.attackedPositions).toContainEqual({ row: 5, column: 5, hit: false });
 });
 
 test("receiveAttack does not allow duplicate attacks on the same coordinate", () => {
