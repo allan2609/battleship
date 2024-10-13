@@ -5,7 +5,6 @@ test("placeShip places a ship on the gameboard at specified coordinates", () => 
   const gameboard = new Gameboard(10);
   const ship = new Ship(3);
   gameboard.placeShip(ship, 2, 2);
-  
   expect(gameboard.getShipAt(2, 2)).toBe(ship);
 });
 
@@ -28,9 +27,7 @@ test("receiveAttack does not allow duplicate attacks on the same coordinate", ()
   const ship = new Ship(3);
   gameboard.placeShip(ship, 2, 2);
   gameboard.receiveAttack(2, 2);
-  gameboard.receiveAttack(2, 2);
-  expect(ship.hitsTaken).toEqual(1);
-  expect(gameboard.attackedPositions.length).toEqual(0);
+  expect(() => gameboard.receiveAttack(2, 2)).toThrow("Position has already been attacked");
 });
 
 test("receiveAttack throws an error if the coordinates are out of bounds", () => {
