@@ -20,7 +20,7 @@ test("receiveAttack sends the hit function to the correct ship", () => {
 test("receiveAttack records the coordinates of a missed shot", () => {
   const gameboard = new Gameboard(10);
   gameboard.receiveAttack(5, 5);
-  expect(gameboard.missedShots).toContainEqual([5, 5]);
+  expect(gameboard.attackedPositions).toContainEqual([5, 5]);
 });
 
 test("receiveAttack does not allow duplicate attacks on the same coordinate", () => {
@@ -30,7 +30,7 @@ test("receiveAttack does not allow duplicate attacks on the same coordinate", ()
   gameboard.receiveAttack(2, 2);
   gameboard.receiveAttack(2, 2);
   expect(ship.hitsTaken).toEqual(1);
-  expect(gameboard.missedShots.length).toEqual(0);
+  expect(gameboard.attackedPositions.length).toEqual(0);
 });
 
 test("receiveAttack throws an error if the coordinates are out of bounds", () => {
