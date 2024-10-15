@@ -30,6 +30,10 @@ class Gameboard {
   }
 
   receiveAttack(row, column) {
+    if (row < 0 || row >= this.size || column < 0 || column >= this.size) {
+      throw new Error("Coordinates are out of bounds");
+    }
+    
     if (this.attackedPositions.some(pos => pos.row === row && pos.column === column)) {
       throw new Error("Position has already been attacked");
     }
