@@ -34,3 +34,8 @@ test("receiveAttack throws an error if the coordinates are out of bounds", () =>
   const gameboard = new Gameboard(10);
   expect(() => gameboard.receiveAttack(11, 5)).toThrow("Coordinates are out of bounds");
 });
+
+test("receiveAttack throws an error if the coordinates are negative", () => {
+  const gameboard = new Gameboard(10);
+  expect(() => gameboard.receiveAttack(-1, -5)).toThrow("Coordinates are out of bounds");
+});
