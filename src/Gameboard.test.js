@@ -39,3 +39,12 @@ test("receiveAttack throws an error if the coordinates are negative", () => {
   const gameboard = new Gameboard(10);
   expect(() => gameboard.receiveAttack(-1, -5)).toThrow("Coordinates are out of bounds");
 });
+
+test("placeShip places a ship vertically on the gameboard", () => {
+  const gameboard = new Gameboard(10);
+  const ship = new Ship(3);
+  gameboard.placeShip(ship, 2, 2, true); // "true" means vertical, horizontal by default
+  expect(gameboard.getShipAt(2, 2)).toBe(ship);
+  expect(gameboard.getShipAt(3, 2)).toBe(ship);
+  expect(gameboard.getShipAt(4, 2)).toBe(ship);
+});
