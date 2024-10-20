@@ -48,3 +48,27 @@ test("placeShip places a ship vertically on the gameboard", () => {
   expect(gameboard.getShipAt(3, 2)).toBe(ship);
   expect(gameboard.getShipAt(4, 2)).toBe(ship);
 });
+
+test("placeShip throws an error if part of a horizontal ship goes out of bounds", () => {
+  const gameboard = new Gameboard(10);
+  const ship = new Ship(3);
+  expect(() => gameboard.placeShip(ship, 2, 10)).toThrow("Cannot place ship out of bounds");
+});
+
+test("placeShip throws an error if part of a vertical ship goes out of bounds", () => {
+  const gameboard = new Gameboard(10);
+  const ship = new Ship(3);
+  expect(() => gameboard.placeShip(ship, 10, 2, true)).toThrow("Cannot place ship out of bounds");
+});
+
+test("placeShip places a horizontal ship at the rightmost edge without error", () => {
+  const gameboard = new Gameboard(10);
+  const ship = new Ship(3);
+  expect(() => gameboard.placeShip(ship, 2, 7)).not.toThrow();
+});
+
+test("placeShip places a vertical ship at the bottom edge without error", () => {
+  const gameboard = new Gameboard(10);
+  const ship = new Ship(3);
+  expect(() => gameboard.placeShip(ship, 7, 2, true)).not.toThrow();
+});
