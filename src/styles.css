@@ -30,3 +30,41 @@ html {
   -moz-box-sizing: inherit;
   box-sizing: inherit;
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100vw;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.gameboards {
+  display: flex;
+  flex: 1;
+  gap: 1rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.player-board, .computer-board {
+  background-color: aliceblue;
+  width: min(28rem, 100%);
+  height: min(28rem, 100%);
+  border: 1px solid #000;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+@media (max-width: 768px) {
+  .gameboards {
+    flex-direction: column;
+  }
+}
