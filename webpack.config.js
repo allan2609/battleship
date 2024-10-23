@@ -20,6 +20,8 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
         template: "./src/index.html",
+        filename: "index.html",
+        watchFiles: ["./src/index.html"],
     }),
   ],
   watch: true,
