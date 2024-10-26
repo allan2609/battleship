@@ -51,9 +51,11 @@ html {
 }
 
 .player-board, .computer-board {
+  display: flex;
+  flex: 1;
   background-color: aliceblue;
-  width: min(28rem, 100%);
-  height: min(28rem, 100%);
+  width: min(18rem, 100%);
+  aspect-ratio: 1 / 1;
   border: 1px solid #000;
 }
 
@@ -63,7 +65,7 @@ html {
   justify-content: space-around;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .gameboards {
     flex-direction: column;
   }
