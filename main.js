@@ -110,13 +110,43 @@ eval("\n\n/* istanbul ignore next  */\nfunction styleTagTransform(css, styleElem
 
 /***/ }),
 
+/***/ "./src/Gameboard.js":
+/*!**************************!*\
+  !*** ./src/Gameboard.js ***!
+  \**************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nclass Gameboard {\n  constructor(size = 10) {\n    this.size = size;\n    this.board = Array(size).fill(null).map(() => Array(size).fill(null));\n    this.ships = [];\n    this.attackedPositions = [];\n  }\n\n  placeShip(ship, row, column, isVertical = false) {\n    if (isVertical) {\n      if (row + ship.length > this.size) {\n        throw new Error(\"Ship cannot be placed out of bounds\");\n      }\n    } else {\n      if (column + ship.length > this.size) {\n        throw new Error(\"Ship cannot be placed out of bounds\");\n      }\n    }\n  \n    for (let i = 0; i < ship.length; i++) {\n      if (isVertical) {\n        if (this.board[row + i][column] !== null) {\n          throw new Error(\"Cannot place ship, position already occupied\");\n        }\n      } else {\n        if (this.board[row][column + i] !== null) {\n          throw new Error(\"Cannot place ship, position already occupied\");\n        }\n      }\n    }\n  \n    for (let i = 0; i < ship.length; i++) {\n      if (isVertical) {\n        this.board[row + i][column] = ship;\n      } else {\n        this.board[row][column + i] = ship;\n      }\n    }\n  \n    this.ships.push(ship);\n  }  \n\n  getShipAt(row, column) {\n    return this.board[row][column];\n  }\n\n  receiveAttack(row, column) {\n    if (row < 0 || row >= this.size || column < 0 || column >= this.size) {\n      throw new Error(\"Coordinates are out of bounds\");\n    }\n\n    if (this.attackedPositions.some(pos => pos.row === row && pos.column === column)) {\n      throw new Error(\"Position has already been attacked\");\n    }\n\n    const target = this.getShipAt(row, column);\n\n    if (target) {\n      target.hit();\n      this.attackedPositions.push({ row, column, hit: true });\n      return \"hit\";\n    } else {\n      this.attackedPositions.push({ row, column, hit: false });\n      return \"miss\";\n    }\n  }\n\n  areAllShipsSunk() {\n    return this.ships.every(ship => ship.isSunk());\n  }\n  \n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Gameboard);\n\n\n//# sourceURL=webpack://battleship/./src/Gameboard.js?");
+
+/***/ }),
+
+/***/ "./src/Player.js":
+/*!***********************!*\
+  !*** ./src/Player.js ***!
+  \***********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _Gameboard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Gameboard */ \"./src/Gameboard.js\");\n\n\nclass Player {\n  constructor(type) {\n    this.type = type;\n    this.gameboard = new _Gameboard__WEBPACK_IMPORTED_MODULE_0__[\"default\"]();\n  }\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Player);\n\n\n//# sourceURL=webpack://battleship/./src/Player.js?");
+
+/***/ }),
+
+/***/ "./src/Ship.js":
+/*!*********************!*\
+  !*** ./src/Ship.js ***!
+  \*********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nclass Ship {\n  constructor(length) {\n    this.length = length;\n    this.hitsTaken = 0;\n    this.sunk = false;\n  }\n\n  hit() {\n    if (!this.sunk) {\n      this.hitsTaken++;\n      this.isSunk();\n    }\n  }\n\n  isSunk() {\n    this.sunk = this.hitsTaken >= this.length;\n    return this.sunk;\n  }\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Ship);\n\n\n//# sourceURL=webpack://battleship/./src/Ship.js?");
+
+/***/ }),
+
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _styles_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./styles.css */ \"./src/styles.css\");\n\n\n\n//# sourceURL=webpack://battleship/./src/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _styles_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./styles.css */ \"./src/styles.css\");\n/* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ \"./src/Player.js\");\n/* harmony import */ var _Ship__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Ship */ \"./src/Ship.js\");\n\n\n\n\nconst player = new _Player__WEBPACK_IMPORTED_MODULE_1__[\"default\"](\"human\");\nconst computer = new _Player__WEBPACK_IMPORTED_MODULE_1__[\"default\"](\"computer\");\n\nconst playerShip1 = new _Ship__WEBPACK_IMPORTED_MODULE_2__[\"default\"](3);\nconst playerShip2 = new _Ship__WEBPACK_IMPORTED_MODULE_2__[\"default\"](4);\nconst computerShip1 = new _Ship__WEBPACK_IMPORTED_MODULE_2__[\"default\"](3);\nconst computerShip2 = new _Ship__WEBPACK_IMPORTED_MODULE_2__[\"default\"](4);\n\nplayer.gameboard.placeShip(playerShip1, 2, 2, false);\nplayer.gameboard.placeShip(playerShip2, 5, 5, true);\ncomputer.gameboard.placeShip(computerShip1, 1, 1, false);\ncomputer.gameboard.placeShip(computerShip2, 6, 3, true);\n\n\n//# sourceURL=webpack://battleship/./src/index.js?");
 
 /***/ })
 
