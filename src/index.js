@@ -14,3 +14,5 @@ player.gameboard.placeShip(playerShip1, 2, 2, false);
 player.gameboard.placeShip(playerShip2, 5, 5, true);
 computer.gameboard.placeShip(computerShip1, 1, 1, false);
 computer.gameboard.placeShip(computerShip2, 6, 3, true);
+
+export { player, computer };
