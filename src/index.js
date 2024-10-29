@@ -1,6 +1,7 @@
 import "./styles.css";
 import Player from "./Player";
 import Ship from "./Ship";
+import { renderPlayerBoard, renderComputerBoard } from "./GameboardRenderer";
 
 const player = new Player("human");
 const computer = new Player("computer");
@@ -14,5 +15,8 @@ player.gameboard.placeShip(playerShip1, 2, 2, false);
 player.gameboard.placeShip(playerShip2, 5, 5, true);
 computer.gameboard.placeShip(computerShip1, 1, 1, false);
 computer.gameboard.placeShip(computerShip2, 6, 3, true);
+
+renderPlayerBoard();
+renderComputerBoard();
 
 export { player, computer };
