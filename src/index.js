@@ -16,6 +16,16 @@ player.gameboard.placeShip(playerShip2, 5, 5, true);
 computer.gameboard.placeShip(computerShip1, 1, 1, false);
 computer.gameboard.placeShip(computerShip2, 6, 3, true);
 
+document.querySelector(".computer-board").addEventListener("click", (e) => {
+  const row = parseInt(e.target.dataset.row, 10);
+  const column = parseInt(e.target.dataset.column, 10);
+
+  if (!isNaN(row) && !isNaN(column)) {
+    computer.gameboard.receiveAttack(row, column);
+    renderComputerBoard();
+  }
+});
+
 renderPlayerBoard();
 renderComputerBoard();
 

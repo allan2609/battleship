@@ -10,6 +10,8 @@ function renderPlayerBoard() {
     row.forEach((cell, colIndex) => {
       const cellElement = document.createElement("div");
       cellElement.classList.add("cell");
+      cellElement.dataset.row = rowIndex;
+      cellElement.dataset.column = colIndex;
 
       if (cell === "hit") cellElement.classList.add("hit");
       else if (cell === "miss") cellElement.classList.add("miss");
@@ -30,6 +32,8 @@ function renderComputerBoard() {
     row.forEach((cell, colIndex) => {
       const cellElement = document.createElement("div");
       cellElement.classList.add("cell");
+      cellElement.dataset.row = rowIndex;
+      cellElement.dataset.column = colIndex;
 
       if (cell === "hit") cellElement.classList.add("hit");
       else if (cell === "miss") cellElement.classList.add("miss");
