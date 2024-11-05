@@ -51,12 +51,25 @@ html {
 }
 
 .player-board, .computer-board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  gap: 1px;
+  width: 100%;
+  max-width: 25rem;
+  aspect-ratio: 1;
+}
+
+.cell {
+  background-color: lightblue;
+  border: 1px solid #333;
   display: flex;
-  flex: 1;
-  background-color: aliceblue;
-  width: min(18rem, 100%);
-  aspect-ratio: 1 / 1;
-  border: 1px solid #000;
+  align-items: center;
+  justify-content: center;
+}
+
+.ship {
+  background-color: darkgrey;
 }
 
 .buttons {
