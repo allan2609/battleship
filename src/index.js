@@ -1,10 +1,13 @@
 import "./styles.css";
 import Player from "./Player";
 import Ship from "./Ship";
+import GameController from "./GameController";
 import { renderPlayerBoard, renderComputerBoard } from "./GameboardRenderer";
 
 const player = new Player("human");
 const computer = new Player("computer");
+
+const gameController = new GameController(player, computer);
 
 const playerShip1 = new Ship(3);
 const playerShip2 = new Ship(4);
