@@ -54,14 +54,15 @@ class Gameboard {
     }
 
     const target = this.getShipAt(row, column);
+    const result = target ? "hit" : "miss";
 
     if (target) {
       target.hit();
       this.attackedPositions.push({ row, column, hit: true });
-      return "hit";
+      return { result, row, column };
     } else {
       this.attackedPositions.push({ row, column, hit: false });
-      return "miss";
+      return { result, row, column };
     }
   }
 

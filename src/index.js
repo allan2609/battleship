@@ -27,7 +27,16 @@ document.querySelector(".computer-board").addEventListener("click", (e) => {
   const column = parseInt(e.target.dataset.column, 10);
 
   if (!isNaN(row) && !isNaN(column)) {
-    gameController.handleAttack(row, column);
+    const attackResult = computer.gameboard.receiveAttack(row, column);
+
+    const cell = e.target;
+    if (attackResult.result === "hit") {
+      cell.classList.add("hit");
+    } else {
+      cell.classList.add("miss");
+    }
+
+    renderComputerBoard();
   }
 });
 
