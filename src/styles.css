@@ -78,6 +78,14 @@ html {
   justify-content: space-around;
 }
 
+.hit {
+  background-color: red;
+}
+
+.miss {
+  background-color: lightgray;
+}
+
 @media (max-width: 640px) {
   .gameboards {
     flex-direction: column;
