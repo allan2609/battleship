@@ -48,22 +48,23 @@ class Gameboard {
     if (row < 0 || row >= this.size || column < 0 || column >= this.size) {
       throw new Error("Coordinates are out of bounds");
     }
-
+  
     if (this.attackedPositions.some(pos => pos.row === row && pos.column === column)) {
       throw new Error("Position has already been attacked");
     }
-
+  
     const target = this.getShipAt(row, column);
     const result = target ? "hit" : "miss";
-
+  
     if (target) {
       target.hit();
-      this.attackedPositions.push({ row, column, hit: true });
-      return { result, row, column };
+      this.board[row][column] = "hit";
     } else {
-      this.attackedPositions.push({ row, column, hit: false });
-      return { result, row, column };
+      this.board[row][column] = "miss";
     }
+  
+    this.attackedPositions.push({ row, column, hit: result === "hit" });
+    return { result, row, column };
   }
 
   areAllShipsSunk() {

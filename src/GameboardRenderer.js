@@ -35,8 +35,11 @@ function renderComputerBoard() {
       cellElement.dataset.row = rowIndex;
       cellElement.dataset.column = colIndex;
 
-      if (cell === "hit") cellElement.classList.add("hit");
-      else if (cell === "miss") cellElement.classList.add("miss");
+      if (cell === "hit") {
+        cellElement.classList.add("hit");
+      } else if (cell === "miss") {
+        cellElement.classList.add("miss");
+      }
 
       computerBoardElement.appendChild(cellElement);
     });
