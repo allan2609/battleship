@@ -8,18 +8,8 @@ class GameController {
   }
 
   handleAttack(row, column) {
-    if (this.currentTurn !== "player") return;
-
     const result = this.computer.gameboard.receiveAttack(row, column);
-
-    const cell = document.querySelector(`.computer-board [data-row="${row}"][data-column="${column}"]`);
-    if (cell) cell.classList.add(result);
-
-    renderPlayerBoard();
     renderComputerBoard();
-
-    this.switchTurn();
-    this.computerMove();
   }
 
   switchTurn() {
