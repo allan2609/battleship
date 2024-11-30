@@ -17,24 +17,36 @@ class GameController {
   }
 
   computerMove() {
-    if (this.currentTurn !== "computer") return;
-
+    if (this.currentTurn !== "computer" || this.isGameOver) return;
+  
     let row, column;
     do {
       row = Math.floor(Math.random() * this.player.gameboard.size);
       column = Math.floor(Math.random() * this.player.gameboard.size);
     } while (this.player.gameboard.attackedPositions.some(pos => pos.row === row && pos.column === column));
-
-    const result = this.player.gameboard.receiveAttack(row, column);
-
-    const cell = document.querySelector(`.player-board [data-row="${row}"][data-column="${column}"]`);
-    if (cell) cell.classList.add(result);
-
+  
+    this.player.gameboard.receiveAttack(row, column);
     renderPlayerBoard();
-    renderComputerBoard();
-
+    this.checkGameOver();
     this.switchTurn();
+  }  
+
+  checkGameOver() {
+    if (this.player.gameboard.areAllShipsSunk()) {
+      alert("Computer wins!");
+      this.isGameOver = true;
+      this.endGame();
+    } else if (this.computer.gameboard.areAllShipsSunk()) {
+      alert("Player wins!");
+      this.isGameOver = true;
+      this.endGame();
+    }
   }
+  
+  endGame() {
+    document.querySelector(".computer-board").removeEventListener("click", this.handleAttack);
+  }
+  
 }
 
 export default GameController;
