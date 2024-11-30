@@ -26,9 +26,15 @@ document.querySelector(".computer-board").addEventListener("click", (e) => {
   const row = parseInt(e.target.dataset.row, 10);
   const column = parseInt(e.target.dataset.column, 10);
 
-  if (!isNaN(row) && !isNaN(column)) {
-    computer.gameboard.receiveAttack(row, column);
-    renderComputerBoard();
+  if (gameController.currentTurn === "player" && !isNaN(row) && !isNaN(column)) {
+    gameController.handleAttack(row, column);
+    
+    gameController.checkGameOver();
+
+    if (!gameController.isGameOver) {
+      gameController.switchTurn();
+      gameController.computerMove();
+    }
   }
 });
 
