@@ -8,7 +8,7 @@ class GameController {
   }
 
   handleAttack(row, column) {
-    const result = this.computer.gameboard.receiveAttack(row, column);
+    this.computer.gameboard.receiveAttack(row, column);
     renderComputerBoard();
   }
 
