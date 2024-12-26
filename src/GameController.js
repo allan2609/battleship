@@ -1,16 +1,18 @@
 import { renderPlayerBoard, renderComputerBoard } from "./GameboardRenderer";
-import Ship from "./Ship";
 
 class GameController {
   constructor(player, computer) {
     this.player = player;
     this.computer = computer;
     this.currentTurn = "player";
-    this.lastHit = null;
-    this.targetQueue = [];
-    this.direction = null;
-    this.previousHit = null;
     this.isGameOver = false;
+    this.computerAI = {
+      huntMode: false,
+      firstHit: null,
+      lastHit: null,
+      direction: null,
+      triedDirections: new Set()
+    };
   }
 
   handleAttack(row, column) {
@@ -18,15 +20,7 @@ class GameController {
 
     const attackResult = this.computer.gameboard.receiveAttack(row, column);
     renderComputerBoard();
-
-    console.log("Player's attack result:", attackResult);
-
-    if (attackResult.result === "hit") {
-      console.log("Player hit!");
-    } else {
-      console.log("Player missed!");
-    }
-
+    
     this.checkGameOver();
 
     if (!this.isGameOver) {
@@ -36,8 +30,7 @@ class GameController {
 
   switchTurn() {
     this.currentTurn = this.currentTurn === "player" ? "computer" : "player";
-    console.log(`Switching turn. Current turn: ${this.currentTurn}`);
-
+    
     if (this.currentTurn === "computer") {
       this.computerMove();
     }
@@ -45,171 +38,212 @@ class GameController {
 
   computerMove() {
     if (this.isGameOver || this.currentTurn !== "computer") return;
-  
-    console.log("Computer's turn. Target Queue:", this.targetQueue);
-  
-    let target;
-    
-    if (this.direction && this.lastHit) {
-      const alignedTargets = this.targetQueue.filter(cell => 
-        this.direction === "horizontal" ? 
-          cell.row === this.lastHit.row : 
-          cell.column === this.lastHit.column
-      );
-      
-      if (alignedTargets.length > 0) {
-        target = alignedTargets[0];
-        this.targetQueue = this.targetQueue.filter(cell => 
-          !(cell.row === target.row && cell.column === target.column)
-        );
-        console.log("Attacking aligned target:", target);
-      }
-    }
-    
-    if (!target && this.targetQueue.length > 0) {
-      target = this.targetQueue.shift();
-      console.log("Attacking from target queue:", target);
-    }
-    
+
+    const target = this.getComputerTarget();
     if (!target) {
-      do {
-        const row = Math.floor(Math.random() * this.player.gameboard.size);
-        const column = Math.floor(Math.random() * this.player.gameboard.size);
-        target = { row, column };
-      } while (
-        this.player.gameboard.attackedPositions.some(
-          pos => pos.row === target.row && pos.column === target.column
-        )
-      );
-      console.log("Random attack at:", target);
+      this.isGameOver = true;
+      return;
     }
-    
+
     const attackResult = this.player.gameboard.receiveAttack(target.row, target.column);
-    console.log("Attack result:", attackResult);
-    
-    if (attackResult.result === "hit") {
-      if (this.lastHit && !this.direction) {
-        this.direction = this.lastHit.row === target.row ? "horizontal" : "vertical";
-        console.log("New direction determined:", this.direction);
-      }
-      
-      this.previousHit = this.lastHit;
-      this.lastHit = target;
-      
-      if (this.direction) {
-        this.addDirectionalTargets(target);
-      } else {
-        this.addAdjacentTargets(target);
-      }
-      
-      if (this.checkShipSunk(target)) {
-        console.log("Ship sunk! Resetting attack pattern.");
-        this.resetAttackPattern();
-      }
-    }
+    this.updateComputerAI(attackResult);
     
     renderPlayerBoard();
     
     this.checkGameOver();
-    
+
     if (!this.isGameOver) {
       this.currentTurn = "player";
-      console.log("Computer's turn ended. Current turn:", this.currentTurn);
     }
   }
 
-  addDirectionalTargets({ row, column }) {
-    let potentialTargets = [];
+  getComputerTarget() {
+    return this.computerAI.huntMode ? 
+      this.getHuntModeTarget() : 
+      this.getRandomTarget();
+  }
+
+  getHuntModeTarget() {
+    const { firstHit, lastHit, direction, triedDirections } = this.computerAI;
+    const currentHit = lastHit || firstHit;
     
-    if (this.direction === "horizontal") {
-      potentialTargets = [
-        { row, column: column - 1 },
-        { row, column: column + 1 }
-      ];
-    } else if (this.direction === "vertical") {
-      potentialTargets = [
-        { row: row - 1, column },
-        { row: row + 1, column }
-      ];
+    if (direction) {
+      const target = this.getNextTargetInDirection(currentHit, direction);
+      if (target && this.isValidTarget(target)) {
+        return target;
+      }
+      const oppositeTarget = this.getNextTargetInDirection(firstHit, this.getOppositeDirection(direction));
+      if (oppositeTarget && this.isValidTarget(oppositeTarget)) {
+        return oppositeTarget;
+      }
+    }
+
+    const directions = ["north", "south", "east", "west"];
+    for (const dir of directions) {
+      if (!triedDirections.has(dir)) {
+        const target = this.getNextTargetInDirection(firstHit, dir);
+        if (target && this.isValidTarget(target)) {
+          triedDirections.add(dir);
+          return target;
+        }
+      }
+    }
+
+    this.resetComputerAI();
+    return this.getRandomTarget();
+  }
+
+  getNextTargetInDirection(position, direction) {
+    const directionMap = {
+      north: { row: -1, column: 0 },
+      south: { row: 1, column: 0 },
+      east: { row: 0, column: 1 },
+      west: { row: 0, column: -1 }
+    };
+
+    const offset = directionMap[direction];
+    return {
+      row: position.row + offset.row,
+      column: position.column + offset.column
+    };
+  }
+
+  getOppositeDirection(direction) {
+    const opposites = {
+      north: "south",
+      south: "north",
+      east: "west",
+      west: "east"
+    };
+    return opposites[direction];
+  }
+
+  getRandomTarget() {
+    const unattackedCells = [];
+    for (let row = 0; row < this.player.gameboard.size; row++) {
+      for (let col = 0; col < this.player.gameboard.size; col++) {
+        if (this.isValidTarget({ row, column: col })) {
+          unattackedCells.push({ row, column: col });
+        }
+      }
     }
     
-    const validTargets = potentialTargets.filter(target => {
-      const isWithinBounds =
-        target.row >= 0 &&
-        target.row < this.player.gameboard.size &&
-        target.column >= 0 &&
-        target.column < this.player.gameboard.size;
-        
-      const isNotAttacked = !this.player.gameboard.attackedPositions.some(
-        pos => pos.row === target.row && pos.column === target.column
-      );
+    return unattackedCells.length > 0 ? 
+      unattackedCells[Math.floor(Math.random() * unattackedCells.length)] : 
+      null;
+  }
+
+  isValidTarget(target) {
+    const { row, column } = target;
+    const isWithinBounds =
+      row >= 0 &&
+      row < this.player.gameboard.size &&
+      column >= 0 &&
+      column < this.player.gameboard.size;
+
+    const isNotAttacked = !this.player.gameboard.attackedPositions.some(
+      pos => pos.row === row && pos.column === column
+    );
+
+    return isWithinBounds && isNotAttacked;
+  }
+
+  updateComputerAI(attackResult) {
+    const { result, row, column } = attackResult;
+    
+    if (result === "hit") {
+      if (!this.computerAI.huntMode) {
+        this.computerAI.huntMode = true;
+        this.computerAI.firstHit = { row, column };
+        this.computerAI.lastHit = { row, column };
+      } else if (!this.computerAI.direction) {
+        const isVertical = this.computerAI.firstHit.row !== row;
+        this.computerAI.direction = isVertical ? 
+          (row > this.computerAI.firstHit.row ? "south" : "north") :
+          (column > this.computerAI.firstHit.column ? "east" : "west");
+        this.computerAI.lastHit = { row, column };
+      } else {
+        this.computerAI.lastHit = { row, column };
+      }
+
+      const hitPositions = this.findConnectedHits(row, column);
+      if (this.isConnectedHitsFormCompleteSink(hitPositions)) {
+        this.resetComputerAI();
+      }
+    }
+  }
+
+  findConnectedHits(startRow, startCol) {
+    const connected = new Set();
+    const toCheck = [{row: startRow, column: startCol}];
+    
+    while (toCheck.length > 0) {
+      const current = toCheck.pop();
+      const key = `${current.row},${current.column}`;
       
-      return isWithinBounds && isNotAttacked;
-    });
+      if (connected.has(key)) continue;
+      
+      if (this.player.gameboard.board[current.row][current.column] === "hit") {
+        connected.add(key);
+        
+        const adjacent = [
+          {row: current.row - 1, column: current.column},
+          {row: current.row + 1, column: current.column},
+          {row: current.row, column: current.column - 1},
+          {row: current.row, column: current.column + 1}
+        ];
+        
+        for (const pos of adjacent) {
+          if (this.isValidBoardPosition(pos.row, pos.column)) {
+            toCheck.push(pos);
+          }
+        }
+      }
+    }
     
-    this.targetQueue.push(...validTargets);
+    return Array.from(connected).map(key => {
+      const [row, col] = key.split(",").map(Number);
+      return {row, column: col};
+    });
   }
 
-  getDirection(firstHit, secondHit) {
-    if (firstHit.row === secondHit.row) return "horizontal";
-    if (firstHit.column === secondHit.column) return "vertical";
-    return null;
-  }
-
-  isAligned(cell, direction) {
-    if (direction === "horizontal") return cell.row === this.lastHit.row;
-    if (direction === "vertical") return cell.column === this.lastHit.column;
+  isConnectedHitsFormCompleteSink(hitPositions) {
+    for (const pos of hitPositions) {
+      const adjacent = [
+        {row: pos.row - 1, column: pos.column},
+        {row: pos.row + 1, column: pos.column},
+        {row: pos.row, column: pos.column - 1},
+        {row: pos.row, column: pos.column + 1}
+      ];
+      
+      for (const adjPos of adjacent) {
+        if (this.isValidBoardPosition(adjPos.row, adjPos.column)) {
+          const cell = this.player.gameboard.board[adjPos.row][adjPos.column];
+          if (cell !== null && cell !== "hit" && cell !== "miss") {
+            return false;
+          }
+        }
+      }
+    }
+    
     return true;
   }
 
-  addAdjacentTargets({ row, column }) {
-    const potentialTargets = [
-      { row: row - 1, column },
-      { row: row + 1, column },
-      { row, column: column - 1 },
-      { row, column: column + 1 },
-    ];
-
-    const filteredTargets = potentialTargets.filter(target => {
-      const isWithinBounds =
-        target.row >= 0 &&
-        target.row < this.player.gameboard.size &&
-        target.column >= 0 &&
-        target.column < this.player.gameboard.size;
-
-      const isAlreadyAttacked = this.player.gameboard.attackedPositions.some(
-        pos => pos.row === target.row && pos.column === target.column
-      );
-
-      if (!isWithinBounds || isAlreadyAttacked) return false;
-
-      if (this.direction === "horizontal") {
-        return target.row === this.lastHit.row;
-      } else if (this.direction === "vertical") {
-        return target.column === this.lastHit.column;
-      }
-
-      return true;
-    });
-
-    this.targetQueue.push(...filteredTargets);
+  isValidBoardPosition(row, column) {
+    return row >= 0 && 
+           row < this.player.gameboard.size && 
+           column >= 0 && 
+           column < this.player.gameboard.size;
   }
 
-  checkShipSunk(target) {
-    const ship = this.player.gameboard.getShipAt(target.row, target.column);
-    console.log("Ship at target:", ship);
-
-    if (ship && ship instanceof Ship) {
-      return ship.isSunk();
-    }
-
-    return false;
-  }
-
-  resetAttackPattern() {
-    this.direction = null;
-    this.previousHit = null;
-    this.targetQueue = [];
+  resetComputerAI() {
+    this.computerAI = {
+      huntMode: false,
+      firstHit: null,
+      lastHit: null,
+      direction: null,
+      triedDirections: new Set()
+    };
   }
 
   checkGameOver() {
