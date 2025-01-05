@@ -70,6 +70,46 @@ class Gameboard {
   areAllShipsSunk() {
     return this.ships.every(ship => ship.isSunk());
   }
+
+  initializeBoard() {
+    return Array.from({ length: this.size }, () => Array(this.size).fill(null));
+  }
+
+  clear() {
+    this.board = this.initializeBoard();
+    this.ships = [];
+  }
+
+  canPlaceShip(ship, row, column, isVertical) {
+    if (isVertical) {
+      if (row + ship.length > this.size) return false;
+      for (let i = 0; i < ship.length; i++) {
+        if (this.board[row + i][column] !== null) return false;
+      }
+    } else {
+      if (column + ship.length > this.size) return false;
+      for (let i = 0; i < ship.length; i++) {
+        if (this.board[row][column + i] !== null) return false;
+      }
+    }
+    return true;
+  }  
+
+  randomizeShips(ships) {
+    const directions = [true, false];
+    ships.forEach(ship => {
+      let placed = false;
+      while (!placed) {
+        const row = Math.floor(Math.random() * this.size);
+        const column = Math.floor(Math.random() * this.size);
+        const horizontal = directions[Math.floor(Math.random() * directions.length)];
+        if (this.canPlaceShip(ship, row, column, horizontal)) {
+          this.placeShip(ship, row, column, horizontal);
+          placed = true;
+        }
+      }
+    });
+  }
   
 }
 
