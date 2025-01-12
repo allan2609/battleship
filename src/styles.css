@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -23,6 +25,10 @@ html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+body {
+  font-family: Roboto, sans-serif;
 }
 
 *, *:before, *:after {
@@ -137,6 +143,34 @@ html {
 
 .miss {
   background-color: lightgray;
+}
+
+.targeting {
+  animation: pulse 0.5s ease-in-out;
+  background-color: rgba(255, 0, 0, 0.3) !important;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+  50% {
+    transform: scale(1.1);
+    background-color: rgba(255, 0, 0, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+}
+
+.cell {
+  transition: all 0.3s ease;
+}
+
+.hit {
+  animation: hitEffect 0.5s ease-out;
 }
 
 @media (max-width: 640px) {

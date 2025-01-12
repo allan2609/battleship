@@ -21,6 +21,8 @@ function renderPlayerBoard() {
         cellElement.classList.add("hit");
       } else if (cell === "miss") {
         cellElement.classList.add("miss");
+      } else if (cell !== null) {
+        cellElement.classList.add("ship");
       }
       
       playerBoardElement.appendChild(cellElement);
@@ -180,7 +182,6 @@ function clearShipPosition(row, column, length, isVertical) {
 function renderComputerBoard() {
   const computerBoardElement = document.querySelector(".computer-board");
   const computerBoard = computer.gameboard.board;
-
   computerBoardElement.innerHTML = "";
 
   computerBoard.forEach((row, rowIndex) => {
@@ -195,10 +196,26 @@ function renderComputerBoard() {
       } else if (cell === "miss") {
         cellElement.classList.add("miss");
       }
-
+      
       computerBoardElement.appendChild(cellElement);
     });
   });
 }
 
-export { renderPlayerBoard, renderComputerBoard };
+function highlightCell(row, column) {
+  const cells = document.querySelectorAll(".player-board .cell");
+  const targetCell = Array.from(cells).find(
+    cell => 
+      parseInt(cell.dataset.row) === row && 
+      parseInt(cell.dataset.column) === column
+  );
+
+  if (targetCell) {
+    targetCell.classList.add("targeting");
+    setTimeout(() => {
+      targetCell.classList.remove("targeting");
+    }, 500);
+  }
+}
+
+export { renderPlayerBoard, renderComputerBoard, highlightCell };

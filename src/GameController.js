@@ -1,4 +1,4 @@
-import { renderPlayerBoard, renderComputerBoard } from "./GameboardRenderer";
+import { renderPlayerBoard, renderComputerBoard, highlightCell } from "./GameboardRenderer";
 
 class GameController {
   constructor(player, computer) {
@@ -32,11 +32,13 @@ class GameController {
     this.currentTurn = this.currentTurn === "player" ? "computer" : "player";
     
     if (this.currentTurn === "computer") {
-      this.computerMove();
+      setTimeout(() => {
+        this.computerMove();
+      }, 750);
     }
   }
 
-  computerMove() {
+  async computerMove() {
     if (this.isGameOver || this.currentTurn !== "computer") return;
 
     const target = this.getComputerTarget();
@@ -44,6 +46,10 @@ class GameController {
       this.isGameOver = true;
       return;
     }
+
+    highlightCell(target.row, target.column);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     const attackResult = this.player.gameboard.receiveAttack(target.row, target.column);
     this.updateComputerAI(attackResult);
