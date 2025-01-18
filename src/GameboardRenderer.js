@@ -19,10 +19,12 @@ function renderPlayerBoard() {
 
       if (cell === "hit") {
         cellElement.classList.add("hit");
+        cellElement.classList.add("ship-cell");
       } else if (cell === "miss") {
         cellElement.classList.add("miss");
       } else if (cell !== null) {
         cellElement.classList.add("ship");
+        cellElement.classList.add("ship-cell");
       }
       
       playerBoardElement.appendChild(cellElement);
@@ -193,6 +195,11 @@ function renderComputerBoard() {
 
       if (cell === "hit") {
         cellElement.classList.add("hit");
+        
+        const ship = getShipAtPosition(computer.gameboard, rowIndex, colIndex);
+        if (ship && ship.isSunk()) {
+          cellElement.classList.add("ship-cell");
+        }
       } else if (cell === "miss") {
         cellElement.classList.add("miss");
       }
@@ -200,6 +207,60 @@ function renderComputerBoard() {
       computerBoardElement.appendChild(cellElement);
     });
   });
+}
+
+function getShipAtPosition(gameboard, row, col) {
+  const connectedHits = findConnectedHits(gameboard.board, row, col);
+  
+  for (const ship of gameboard.ships) {
+    for (const pos of connectedHits) {
+      if (gameboard.board[pos.row][pos.column] === ship || 
+         (gameboard.board[pos.row][pos.column] === "hit" && 
+          ship.isSunk())) {
+        return ship;
+      }
+    }
+  }
+  return null;
+}
+
+function findConnectedHits(board, startRow, startCol) {
+  const connected = new Set();
+  const toCheck = [{row: startRow, column: startCol}];
+  
+  while (toCheck.length > 0) {
+    const current = toCheck.pop();
+    const key = `${current.row},${current.column}`;
+    
+    if (connected.has(key)) continue;
+    
+    if (board[current.row][current.column] === "hit") {
+      connected.add(key);
+      
+      const adjacent = [
+        {row: current.row - 1, column: current.column},
+        {row: current.row + 1, column: current.column},
+        {row: current.row, column: current.column - 1},
+        {row: current.row, column: current.column + 1}
+      ];
+      
+      for (const pos of adjacent) {
+        if (isValidPosition(board, pos.row, pos.column)) {
+          toCheck.push(pos);
+        }
+      }
+    }
+  }
+  
+  return Array.from(connected).map(key => {
+    const [row, col] = key.split(",").map(Number);
+    return {row, column: col};
+  });
+}
+
+function isValidPosition(board, row, col) {
+  return row >= 0 && row < board.length && 
+         col >= 0 && col < board[0].length;
 }
 
 function highlightCell(row, column) {
