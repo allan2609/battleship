@@ -6,7 +6,7 @@ import { renderPlayerBoard, renderComputerBoard } from "./GameboardRenderer";
 
 const player = new Player("human");
 const computer = new Player("computer");
-const gameController = new GameController(player, computer);
+let gameController;
 
 function createShips() {
   return [
@@ -18,33 +18,50 @@ function createShips() {
   ];
 }
 
-function initializeGame() {
-  gameController.resetGame();
-  
+window.initializeGame = function initializeGame() {
+  if (gameController) {
+    gameController.resetGame();
+  }
   const playerShips = createShips();
   const computerShips = createShips();
-  
   player.gameboard.randomizeShips(playerShips);
   computer.gameboard.randomizeShips(computerShips);
-  
   renderPlayerBoard();
   renderComputerBoard();
-}
+};
 
-initializeGame();
+document.addEventListener("DOMContentLoaded", () => {
+  gameController = new GameController(player, computer);
 
-document.querySelector(".computer-board").addEventListener("click", (e) => {
-  const row = parseInt(e.target.dataset.row, 10);
-  const column = parseInt(e.target.dataset.column, 10);
-  if (gameController.currentTurn === "player" && !isNaN(row) && !isNaN(column)) {
-    gameController.handleAttack(row, column);
-  }
-});
+  const computerBoard = document.querySelector(".computer-board");
+  const randomizeButton = document.querySelector(".randomize-button");
+  const modalOverlay = document.querySelector(".modal-overlay");
+  const modalButton = document.querySelector(".modal-button");
 
-document.querySelector(".randomize-button").addEventListener("click", (e) => {
-  if (!e.target.classList.contains("disabled")) {
-    initializeGame();
-  }
+  computerBoard.addEventListener("click", (e) => {
+    const row = parseInt(e.target.dataset.row, 10);
+    const column = parseInt(e.target.dataset.column, 10);
+    if (gameController.currentTurn === "player" && !isNaN(row) && !isNaN(column)) {
+      gameController.handleAttack(row, column);
+    }
+  });
+
+  randomizeButton.addEventListener("click", window.initializeGame);
+
+  modalOverlay.addEventListener("click", (e) => {
+    if (e.target === modalOverlay) {
+      gameController.hideModal();
+      window.initializeGame();
+    }
+  });
+
+  modalButton.addEventListener("click", (e) => {
+    e.stopPropagation();
+    gameController.hideModal();
+    window.initializeGame();
+  });
+
+  window.initializeGame();
 });
 
 export { player, computer };

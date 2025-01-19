@@ -75,6 +75,7 @@ class GameController {
     this.gameStarted = false;
     this.computerAI = this.initializeComputerAI();
     document.querySelector(".player-board").classList.remove("game-started");
+    this.hideModal();
     this.updateTurnVisuals();
     
     this.player.gameboard.clear();
@@ -316,13 +317,29 @@ class GameController {
     };
   }
 
+  showModal(message) {
+    const modal = document.querySelector(".modal-overlay");
+    const title = modal.querySelector(".modal-title");
+    title.textContent = message;
+    modal.classList.add("active");
+  }
+
+  hideModal() {
+    const modal = document.querySelector(".modal-overlay");
+    modal.classList.remove("active");
+  }
+
   checkGameOver() {
     if (this.player.gameboard.areAllShipsSunk()) {
-      alert("Computer wins!");
-      this.isGameOver = true;
+      if (!this.isGameOver) {
+        this.showModal("Computer wins!");
+        this.isGameOver = true;
+      }
     } else if (this.computer.gameboard.areAllShipsSunk()) {
-      alert("Player wins!");
-      this.isGameOver = true;
+      if (!this.isGameOver) {
+        this.showModal("Player wins!");
+        this.isGameOver = true;
+      }
     }
   }
 }
