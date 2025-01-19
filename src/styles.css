@@ -129,6 +129,15 @@ body {
   z-index: 2;
 }
 
+.game-started .ship-container {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.game-started .ship-container:hover {
+  opacity: 1;
+}
+
 .buttons {
   display: flex;
   width: 100%;

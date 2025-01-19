@@ -111,6 +111,11 @@ class Gameboard {
     });
   }
   
+  clear() {
+    this.board = this.initializeBoard();
+    this.ships = [];
+    this.attackedPositions = [];
+  }
 }
 
 export default Gameboard;

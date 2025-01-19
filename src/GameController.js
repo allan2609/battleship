@@ -6,7 +6,18 @@ class GameController {
     this.computer = computer;
     this.currentTurn = "player";
     this.isGameOver = false;
+    this.gameStarted = false;
     this.computerAI = {
+      huntMode: false,
+      firstHit: null,
+      lastHit: null,
+      direction: null,
+      triedDirections: new Set()
+    };
+  }
+
+  initializeComputerAI() {
+    return {
       huntMode: false,
       firstHit: null,
       lastHit: null,
@@ -17,14 +28,54 @@ class GameController {
 
   handleAttack(row, column) {
     if (this.isGameOver || this.currentTurn !== "player") return;
-
-    const attackResult = this.computer.gameboard.receiveAttack(row, column);
-    renderComputerBoard();
     
-    this.checkGameOver();
+    if (!this.gameStarted) {
+      this.gameStarted = true;
+      document.querySelector('.player-board').classList.add('game-started');
+    }
 
-    if (!this.isGameOver) {
-      this.switchTurn();
+    try {
+      const attackResult = this.computer.gameboard.receiveAttack(row, column);
+      renderComputerBoard();
+      
+      this.checkGameOver();
+
+      if (!this.isGameOver) {
+        this.switchTurn();
+      }
+    } catch (error) {
+      console.log("Invalid attack position");
+    }
+  }
+
+  resetGame() {
+    this.currentTurn = "player";
+    this.isGameOver = false;
+    this.gameStarted = false;
+    this.computerAI = this.initializeComputerAI();
+    document.querySelector('.player-board').classList.remove('game-started');
+    
+    this.player.gameboard.clear();
+    this.computer.gameboard.clear();
+  }
+
+  checkGameOver() {
+    if (this.player.gameboard.areAllShipsSunk()) {
+      if (!this.isGameOver) {
+        setTimeout(() => {
+          if (!this.isGameOver) return;
+          alert("Computer wins!");
+        }, 100);
+      }
+      this.isGameOver = true;
+    } else if (this.computer.gameboard.areAllShipsSunk()) {
+      if (!this.isGameOver) {
+        setTimeout(() => {
+          if (!this.isGameOver) return;
+          alert("Player wins!");
+        }, 100);
+      }
+      this.isGameOver = true;
     }
   }
 
