@@ -41,6 +41,10 @@ document.querySelector(".computer-board").addEventListener("click", (e) => {
   }
 });
 
-document.querySelector(".randomize-button").addEventListener("click", initializeGame);
+document.querySelector(".randomize-button").addEventListener("click", (e) => {
+  if (!e.target.classList.contains("disabled")) {
+    initializeGame();
+  }
+});
 
 export { player, computer };

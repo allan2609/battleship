@@ -7,13 +7,8 @@ class GameController {
     this.currentTurn = "player";
     this.isGameOver = false;
     this.gameStarted = false;
-    this.computerAI = {
-      huntMode: false,
-      firstHit: null,
-      lastHit: null,
-      direction: null,
-      triedDirections: new Set()
-    };
+    this.computerAI = this.initializeComputerAI();
+    this.updateTurnVisuals();
   }
 
   initializeComputerAI() {
@@ -31,7 +26,7 @@ class GameController {
     
     if (!this.gameStarted) {
       this.gameStarted = true;
-      document.querySelector('.player-board').classList.add('game-started');
+      document.querySelector(".player-board").classList.add("game-started");
     }
 
     try {
@@ -48,12 +43,39 @@ class GameController {
     }
   }
 
+  switchTurn() {
+    this.currentTurn = this.currentTurn === "player" ? "computer" : "player";
+    this.updateTurnVisuals();
+    
+    if (this.currentTurn === "computer") {
+      setTimeout(() => {
+        this.computerMove();
+      }, 750);
+    }
+  }
+
+  updateTurnVisuals() {
+    const computerBoard = document.querySelector(".computer-board");
+    const randomizeButton = document.querySelector(".randomize-button");
+    
+    if (this.currentTurn === "computer") {
+      computerBoard.classList.add("computer-turn");
+      randomizeButton.classList.add("disabled");
+      randomizeButton.style.pointerEvents = "none";
+    } else {
+      computerBoard.classList.remove("computer-turn");
+      randomizeButton.classList.remove("disabled");
+      randomizeButton.style.pointerEvents = "auto";
+    }
+  }
+
   resetGame() {
     this.currentTurn = "player";
     this.isGameOver = false;
     this.gameStarted = false;
     this.computerAI = this.initializeComputerAI();
-    document.querySelector('.player-board').classList.remove('game-started');
+    document.querySelector(".player-board").classList.remove("game-started");
+    this.updateTurnVisuals();
     
     this.player.gameboard.clear();
     this.computer.gameboard.clear();
@@ -79,16 +101,6 @@ class GameController {
     }
   }
 
-  switchTurn() {
-    this.currentTurn = this.currentTurn === "player" ? "computer" : "player";
-    
-    if (this.currentTurn === "computer") {
-      setTimeout(() => {
-        this.computerMove();
-      }, 750);
-    }
-  }
-
   async computerMove() {
     if (this.isGameOver || this.currentTurn !== "computer") return;
 
@@ -110,7 +122,8 @@ class GameController {
     this.checkGameOver();
 
     if (!this.isGameOver) {
-      this.currentTurn = "player";
+      this.switchTurn();
+      this.updateTurnVisuals(); 
     }
   }
 
