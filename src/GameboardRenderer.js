@@ -100,6 +100,7 @@ function createShipElement(shipData) {
 
   shipElement.addEventListener("dragstart", handleDragStart);
   shipElement.addEventListener("dragend", handleDragEnd);
+  shipElement.addEventListener("dblclick", handleShipRotation);
 
   return shipElement;
 }
@@ -169,6 +170,35 @@ function handleDrop(e) {
   }
 
   renderPlayerBoard();
+}
+
+function handleShipRotation(e) {
+  if (document.querySelector(".player-board").classList.contains("game-started")) {
+    return;
+  }
+
+  const shipElement = e.target;
+  const row = parseInt(shipElement.dataset.originalRow);
+  const column = parseInt(shipElement.dataset.originalColumn);
+  const length = parseInt(shipElement.dataset.shipLength);
+  const isVertical = shipElement.dataset.isVertical === "true";
+  
+  try {
+    const ship = player.gameboard.getShipAt(row, column);
+    if (!ship) return;
+
+    clearShipPosition(row, column, length, isVertical);
+
+    if (player.gameboard.canPlaceShip(ship, row, column, !isVertical)) {
+      player.gameboard.placeShip(ship, row, column, !isVertical);
+    } else {
+      player.gameboard.placeShip(ship, row, column, isVertical);
+    }
+
+    renderPlayerBoard();
+  } catch (error) {
+    console.error("Error rotating ship:", error);
+  }
 }
 
 function clearShipPosition(row, column, length, isVertical) {

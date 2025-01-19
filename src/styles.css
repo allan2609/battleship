@@ -134,6 +134,22 @@ body {
   margin: 0;
 }
 
+.ship-container:not(.game-started):hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  transform: scale(1.02);
+}
+
+/* Add a subtle rotation animation on double click */
+@keyframes rotateShip {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1) rotate(180deg); }
+  100% { transform: scale(1); }
+}
+
+.ship-container.rotating {
+  animation: rotateShip 0.3s ease;
+}
+
 .ship-container.dragging {
   opacity: 0.6;
   z-index: 2;
